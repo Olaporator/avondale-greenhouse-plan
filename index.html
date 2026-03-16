@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Twin Passive-Solar Greenhouse — Redmond, WA</title>
+<style>
+:root{--earth:#5C4033;--timber:#8B6914;--glass:#A8D8EA;--gdk:#5BA3C9;--stone:#8C8C8C;--lime:#F5F0E1;--straw:#D4B896;--gd:#2D5A3A;--bg:#FAFAF5;--tx:#2C2C2C;--bd:#D4C9B8;--w:#FFF;--hi:#E8F0E2}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:Georgia,serif;background:var(--bg);color:var(--tx);line-height:1.55}
+h1,h2,h3,h4{font-family:'Segoe UI',sans-serif}
+nav{position:sticky;top:0;z-index:200;background:var(--earth);overflow-x:auto;white-space:nowrap;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+nav a{display:inline-block;color:var(--lime);text-decoration:none;padding:10px 13px;font-size:12.5px;font-family:sans-serif}
+nav a:hover{background:var(--gd);color:#fff}
+.s{max-width:1060px;margin:18px auto;padding:20px 28px;background:var(--w);border:1px solid var(--bd);border-radius:6px}
+.s h2{color:var(--earth);border-bottom:2px solid var(--timber);padding-bottom:4px;margin-bottom:12px;font-size:1.3em}
+.s h3{color:var(--gd);margin:10px 0 5px;font-size:1.05em}
+table{width:100%;border-collapse:collapse;margin:8px 0;font-size:13px}
+th{background:var(--earth);color:#fff;padding:6px 8px;text-align:left;font-family:sans-serif;font-size:12px}
+td{padding:5px 8px;border-bottom:1px solid var(--bd)}
+tr:nth-child(even){background:var(--hi)}
+.n{text-align:right;font-family:monospace}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:700px){.g2{grid-template-columns:1fr}}
+.co{background:var(--hi);border-left:4px solid #4A7C59;padding:10px 14px;margin:10px 0;border-radius:0 4px 4px 0;font-size:13.5px}
+.cw{background:#FFF3E0;border-left-color:#E65100}
+.mr{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.mc{flex:1;min-width:120px;background:var(--lime);border:1px solid var(--bd);border-radius:6px;padding:10px;text-align:center}
+.mc .v{font-size:1.5em;font-weight:bold;color:var(--gd);font-family:sans-serif}
+.mc .l{font-size:9.5px;color:#666;font-family:sans-serif;text-transform:uppercase;letter-spacing:.8px}
+.b{display:inline-block;padding:2px 7px;border-radius:9px;font-size:11px;font-family:sans-serif;font-weight:bold}
+.b1{background:#2D5A3A;color:#fff}.b2{background:#5BA3C9;color:#fff}
+#viewer{width:100%;height:500px;background:#1a1a2e;border-radius:6px;position:relative;cursor:grab}
+#viewer:active{cursor:grabbing}
+#viewer canvas{border-radius:6px}
+.v-ctrl{position:absolute;bottom:10px;left:10px;display:flex;gap:6px;z-index:10}
+.v-ctrl button{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.25);padding:6px 12px;border-radius:4px;cursor:pointer;font-size:11px;font-family:sans-serif}
+.v-ctrl button:hover{background:rgba(255,255,255,.3)}
+.v-label{position:absolute;top:10px;left:10px;color:rgba(255,255,255,.7);font-family:sans-serif;font-size:11px;z-index:10}
+</style>
+</head>
+<body>
+
+<nav>
+<a href="#model">3D Model</a><a href="#dims">Dimensions</a><a href="#plans">Plans</a><a href="#section">Section</a><a href="#glazing">Glazing</a><a href="#options">Options</a><a href="#materials">Materials</a><a href="#cutlist">Cut List</a><a href="#build">Build</a><a href="#compare">Compare</a>
+</nav>
+
+<!-- 3D MODEL -->
+<div class="s" id="model">
+<h2>Interactive 3D Model</h2>
+<div id="viewer">
+<div class="v-label">Drag to orbit &bull; Scroll to zoom &bull; Right-drag to pan</div>
+<div class="v-ctrl">
+<button onclick="viewPreset('se')">SE View</button>
+<button onclick="viewPreset('south')">South</button>
+<button onclick="viewPreset('east')">East End</button>
+<button onclick="viewPreset('top')">Top</button>
+<button onclick="viewPreset('inside')">Interior</button>
+<button onclick="togglePhase()">Toggle Phase 2</button>
+</div>
+</div>
+</div>
+
+<!-- DIMENSIONS -->
+<div class="s" id="dims">
+<h2>Key Dimensions</h2>
+<div class="mr">
+<div class="mc"><div class="v">12&prime;&times;12&prime;</div><div class="l">Each Module</div></div>
+<div class="mc"><div class="v">24&prime;&times;12&prime;</div><div class="l">Combined</div></div>
+<div class="mc"><div class="v">50&deg;</div><div class="l">Glass Angle</div></div>
+<div class="mc"><div class="v">149 ft&sup2;</div><div class="l">Glass / Module</div></div>
+<div class="mc"><div class="v">12.5&prime;</div><div class="l">North Wall</div></div>
+</div>
+<table>
+<tr><th>Parameter</th><th>Value</th><th>Notes</th></tr>
+<tr><td>Module footprint</td><td class="n">12&prime; E-W &times; 12&prime; N-S</td><td>Two modules side by side = 24&prime; E-W &times; 12&prime; N-S</td></tr>
+<tr><td>South slope section</td><td class="n">12&prime; horizontal (N-S)</td><td>8&prime; glass + 4&prime; insulated roof = full depth</td></tr>
+<tr><td>Stem / pony wall</td><td class="n">2.5&prime; (30&Prime;)</td><td>CMU on grade beam; south edge</td></tr>
+<tr><td>Glass slope run</td><td class="n">8&prime; horizontal</td><td>From stem wall top northward</td></tr>
+<tr><td>Glass slope rise</td><td class="n">9.5&prime;</td><td>From 2.5&prime; to 12.0&prime;</td></tr>
+<tr><td>Glass slope angle</td><td class="n">50&deg;</td><td>From horizontal; excellent winter capture</td></tr>
+<tr><td>Glass slope length</td><td class="n">12.4&prime;</td><td>Actual sloped distance</td></tr>
+<tr><td>Insulated roof strip</td><td class="n">4&prime; horizontal</td><td>From glass top to north wall top</td></tr>
+<tr><td>Glass top height</td><td class="n">12.0&prime;</td><td>Ridge beam / glass-roof junction</td></tr>
+<tr><td>North wall height</td><td class="n">~12.5&prime;</td><td>Roof slopes slightly up from ridge</td></tr>
+<tr><td>Grade slope</td><td class="n">~2% toward north</td><td>Drainage toward rubble trench at north wall</td></tr>
+<tr style="font-weight:bold;background:var(--hi)"><td>Glass area per module</td><td class="n">149 ft&sup2;</td><td>12.4&prime; slope &times; 12&prime; width</td></tr>
+<tr style="font-weight:bold;background:var(--hi)"><td>Both modules</td><td class="n">298 ft&sup2;</td><td>Existing inventory: 205 ft&sup2; slope-eligible</td></tr>
+</table>
+<div class="co">
+<strong>50&deg; is near-optimal for Redmond winters.</strong> Winter sun at 18.9&deg; altitude hits a 50&deg; slope at ~69&deg; incidence&mdash;much better than a shallow slope. The steep angle also sheds rain and snow aggressively. Grade slopes toward the north wall, draining into the rubble trench foundation.
+</div>
+</div>
+
+<!-- PLANS -->
+<div class="s" id="plans">
+<h2>Floor Plan</h2>
+<p>Each 12&prime;&times;12&prime; module is entirely under the slope: 8&prime; glass run + 4&prime; insulated roof = full 12&prime; N-S depth. North thermal wall at the back. Water barrels along north wall. Direct in-ground growing on mounds (no raised beds). Grade slopes gently north for drainage to rubble trench. Center wall between modules is glass with a 2-pane window/door opening.</p>
+<div class="g2">
+<div>
+<h3><span class="b b1">Phase 1 (East)</span></h3>
+<p>Standalone 12&prime;&times;12&prime;. Best glass on south slope. Patio door on east end. West end = pre-framed for Phase 2 center glass wall connection.</p>
+</div>
+<div>
+<h3><span class="b b2">Phase 2 (West)</span></h3>
+<p>Joins at center. Screen door on west end. Center wall = full glass with 2-pane window/door opening between greenhouses.</p>
+</div>
+</div>
+</div>
+
+<!-- SECTION -->
+<div class="s" id="section">
+<h2>Building Section</h2>
+<p>Looking east through one module. South at right, north at left. Grade drops ~3&Prime; over 12&prime; toward north wall rubble trench.</p>
+<table>
+<tr><th>Zone (S to N)</th><th>Depth</th><th>Above</th><th>Below</th></tr>
+<tr><td>South stem wall</td><td class="n">0&prime;</td><td>30&Prime; CMU pony wall</td><td>Grade beam + rubble trench</td></tr>
+<tr><td>Glass slope</td><td class="n">0–8&prime;</td><td>50&deg; glass plane (12.4&prime; long)</td><td>In-ground mounds, path</td></tr>
+<tr><td>Insulated roof</td><td class="n">8–12&prime;</td><td>4&prime; timber roof, R-30</td><td>Water barrels along N wall</td></tr>
+<tr><td>North thermal wall</td><td class="n">12&prime;</td><td>12.5&prime; straw-clay + 4&Prime; cob interior</td><td>Rubble trench (drainage collects here)</td></tr>
+</table>
+<h3>Foundation</h3>
+<table>
+<tr><th>Component</th><th>Spec</th><th>Qty / Module</th></tr>
+<tr><td>Rubble trench</td><td>18&Prime;&times;18&Prime;, 3/4&Prime; washed rock</td><td>48 LF, ~2.5 cu yd</td></tr>
+<tr><td>Drain pipe</td><td>4&Prime; perf. HDPE w/ sock</td><td>56 LF</td></tr>
+<tr><td>Grade beam</td><td>12&Prime;&times;8&Prime;, 3000 psi</td><td>48 LF = ~1 cu yd</td></tr>
+<tr><td>CMU stem wall</td><td>8&Prime; CMU, 3.5 courses (30&Prime;)</td><td>~72 blocks</td></tr>
+<tr><td>Sill plate</td><td>6&times;6 PT Doug fir</td><td>48 LF</td></tr>
+<tr><td>Anchor bolts</td><td>1/2&Prime;&times;10&Prime; J-bolt @ 4&prime; o.c.</td><td>12 ea</td></tr>
+</table>
+</div>
+
+<!-- GLAZING -->
+<div class="s" id="glazing">
+<h2>Glazing Schedule</h2>
+<table>
+<tr><th>ID</th><th>Piece</th><th>Qty</th><th>Size</th><th>Area</th></tr>
+<tr><td>LGW</td><td>Large GH Windows</td><td class="n">3</td><td>80&Prime;&times;5&prime;</td><td class="n">100.0</td></tr>
+<tr><td>CDP</td><td>Custom DIY Panel</td><td class="n">1</td><td>9&prime;&times;4&prime;</td><td class="n">36.0</td></tr>
+<tr><td>SMGW</td><td>Sm/Med GH Window</td><td class="n">1</td><td>6&prime;&times;4&prime;</td><td class="n">24.0</td></tr>
+<tr><td>BPP</td><td>Big Plain Pane</td><td class="n">1</td><td>75&Prime;&times;36&Prime;</td><td class="n">18.8</td></tr>
+<tr><td>SPP</td><td>Small Plain Pane</td><td class="n">1</td><td>75&Prime;&times;31.5&Prime;</td><td class="n">16.5</td></tr>
+<tr><td>SD</td><td>Shower Doors</td><td class="n">2</td><td>5&prime;10&Prime;&times;2&prime;5&Prime;</td><td class="n">28.2</td></tr>
+<tr><td>NP</td><td>Narrow Panes</td><td class="n">2</td><td>5&prime;&times;1&prime;</td><td class="n">10.0</td></tr>
+<tr><td>SPD</td><td>Small Patio Door</td><td class="n">1</td><td>80&Prime;&times;2&prime;6&Prime;</td><td class="n">16.7</td></tr>
+<tr><td>WSD</td><td>White Screen Door</td><td class="n">1</td><td>80&Prime;&times;3&prime;6&Prime;</td><td class="n">23.3</td></tr>
+<tr style="font-weight:bold;background:var(--hi)"><td colspan="4">TOTAL EXISTING</td><td class="n">273.5 ft&sup2;</td></tr>
+</table>
+<h3>Requirements</h3>
+<table>
+<tr><th></th><th>/ Module</th><th>Both</th></tr>
+<tr><td>South slope glass</td><td class="n">149 ft&sup2;</td><td class="n">298 ft&sup2;</td></tr>
+<tr><td>Center glass wall</td><td class="n">~60 ft&sup2;</td><td class="n">~60 ft&sup2;</td></tr>
+<tr><td>End walls + doors</td><td class="n">~20 ft&sup2;</td><td class="n">~40 ft&sup2;</td></tr>
+<tr style="font-weight:bold;background:var(--hi)"><td>TOTAL NEEDED</td><td class="n">~169 ft&sup2;</td><td class="n">~398 ft&sup2;</td></tr>
+<tr><td>Existing slope-eligible</td><td colspan="2" class="n">205 ft&sup2;</td></tr>
+<tr><td>Doors (access openings)</td><td colspan="2" class="n">40 ft&sup2;</td></tr>
+<tr style="font-weight:bold;background:#FFF3E0"><td>ADDITIONAL GLASS</td><td colspan="2" class="n">~125 ft&sup2;</td></tr>
+</table>
+<div class="co"><strong>The 50&deg; steep slope + 12&prime; width dramatically reduces glass needs.</strong> Only ~125 ft&sup2; additional glass for the entire complex. Center wall is all glass with a 2-pane door opening. With Option B, Phase 1 needs almost zero additional glass.</div>
+</div>
+
+<!-- OPTIONS -->
+<div class="s" id="options">
+<h2>Glazing Allocation</h2>
+<div class="g2">
+<div>
+<h3>Option A &mdash; Balanced</h3>
+<h4><span class="b b1">P1</span></h4>
+<p>LGW-1, CDP, BPP, SD-1, NP-1 + SPD (door)<br>Existing on slope: ~108 ft&sup2; &rarr; Addl: ~81 ft&sup2;</p>
+<h4><span class="b b2">P2</span></h4>
+<p>LGW-2, LGW-3, SMGW, SPP, SD-2, NP-2 + WSD (door)<br>Existing on slope: ~97 ft&sup2; &rarr; Addl: ~52 ft&sup2;</p>
+</div>
+<div>
+<h3>Option B &mdash; Front-Loaded (Rec.)</h3>
+<h4><span class="b b1">P1</span></h4>
+<p>LGW-1, LGW-2, CDP, SMGW, BPP, SPP, SD-1, NP-1 + SPD<br>Existing on slope: <strong>168 ft&sup2;</strong> &rarr; <strong>Addl: ~21 ft&sup2; only!</strong></p>
+<h4><span class="b b2">P2</span></h4>
+<p>LGW-3, SD-2, NP-2 + WSD<br>Existing on slope: ~37 ft&sup2; &rarr; Addl: ~112 ft&sup2;</p>
+</div>
+</div>
+<div class="co"><strong>Option B:</strong> Phase 1 is nearly complete from existing inventory alone&mdash;only ~21 ft&sup2; shortfall (one small salvaged pane). Phase 2 needs ~112 ft&sup2; additional, sourceable over time.</div>
+</div>
+
+<!-- MATERIALS -->
+<div class="s" id="materials">
+<h2>Materials (Per Module)</h2>
+<h3>Framing</h3>
+<table>
+<tr><th>Item</th><th>Size</th><th>Qty</th></tr>
+<tr><td>Sill plates</td><td>6&times;6 PT</td><td>48 LF</td></tr>
+<tr><td>N. wall posts</td><td>6&times;6 &times; 12.5&prime;</td><td>2</td></tr>
+<tr><td>End/center posts</td><td>6&times;6 &times; varies</td><td>6</td></tr>
+<tr><td>Ridge beam + N. plate</td><td>6&times;8 &times; 12&prime;</td><td>2</td></tr>
+<tr><td>Roof rafters (insul.)</td><td>2&times;8 &times; 5&prime;</td><td>7</td></tr>
+<tr><td>Glass slope rafters</td><td>2&times;8 &times; 14&prime;</td><td>7</td></tr>
+<tr><td>Purlins</td><td>2&times;4 &times; 12&prime;</td><td>10</td></tr>
+<tr><td>Glazing sub-frames</td><td>2&times;4</td><td>~16 pcs</td></tr>
+<tr><td>N. wall studs</td><td>2&times;6 &times; 12.5&prime;</td><td>7</td></tr>
+<tr><td>Bracing</td><td>2&times;6 &times; 10&prime;</td><td>6</td></tr>
+</table>
+<h3>Walls &amp; Thermal</h3>
+<table>
+<tr><th>Item</th><th>Qty</th></tr>
+<tr><td>Straw (straw-clay N. wall)</td><td>~10 bales</td></tr>
+<tr><td>Clay + sand + cob</td><td>~1 cu yd</td></tr>
+<tr><td>Lime plaster (ext.)</td><td>4 bags</td></tr>
+<tr><td>Roof insulation R-30</td><td>48 ft&sup2;</td></tr>
+<tr><td>55-gal water barrels</td><td>3</td></tr>
+</table>
+<h3>Glazing Hardware</h3>
+<table>
+<tr><th>Item</th><th>Qty</th></tr>
+<tr><td>Linseed putty</td><td>2 gal</td></tr>
+<tr><td>Cedar stops 3/4&times;3/4</td><td>160 LF</td></tr>
+<tr><td>EPDM gasket</td><td>120 LF</td></tr>
+<tr><td>Setting blocks</td><td>40</td></tr>
+<tr><td>Galv. flashing</td><td>50 LF</td></tr>
+</table>
+<h3>Connectors</h3>
+<table>
+<tr><th>Item</th><th>Qty</th></tr>
+<tr><td>Post bases (Simpson 6&times;6)</td><td>12</td></tr>
+<tr><td>Column caps</td><td>6</td></tr>
+<tr><td>Hurricane ties</td><td>14</td></tr>
+<tr><td>Structural screws</td><td>50</td></tr>
+<tr><td>Lag screws 1/2&times;8</td><td>24</td></tr>
+</table>
+</div>
+
+<!-- CUT LIST -->
+<div class="s" id="cutlist">
+<h2>Cut List (Phase 1)</h2>
+<table>
+<tr><th>Mark</th><th>Size</th><th>Length</th><th>Qty</th><th>Use</th></tr>
+<tr><td>SP</td><td>6&times;6 PT</td><td>12&prime; + 12&prime;</td><td>2+2</td><td>Sill plates (perimeter)</td></tr>
+<tr><td>P-1</td><td>6&times;6</td><td>12.5&prime;</td><td>4</td><td>N. wall posts</td></tr>
+<tr><td>P-2</td><td>6&times;6</td><td>varies</td><td>8</td><td>End + center posts</td></tr>
+<tr><td>B-1</td><td>6&times;8</td><td>12&prime;</td><td>1</td><td>N. top plate</td></tr>
+<tr><td>B-2</td><td>6&times;8</td><td>12&prime;</td><td>1</td><td>Ridge beam</td></tr>
+<tr><td>R-1</td><td>2&times;8</td><td>5&prime;</td><td>7</td><td>Insul. roof rafters</td></tr>
+<tr><td>R-2</td><td>2&times;8</td><td>14&prime;</td><td>7</td><td>Glass slope rafters (50&deg;)</td></tr>
+<tr><td>PU</td><td>2&times;4</td><td>12&prime;</td><td>10</td><td>Purlins</td></tr>
+<tr><td>GF</td><td>2&times;4</td><td>varies</td><td>~16</td><td>Glazing sub-frames</td></tr>
+<tr><td>ST</td><td>2&times;6</td><td>12.5&prime;</td><td>7</td><td>N. wall studs</td></tr>
+<tr><td>BR</td><td>2&times;6</td><td>10&prime;</td><td>6</td><td>Bracing</td></tr>
+</table>
+</div>
+
+<!-- BUILD SEQUENCE -->
+<div class="s" id="build">
+<h2>Build Sequence</h2>
+<h3><span class="b b1">Phase 1</span> &mdash; 6–8 weeks</h3>
+<table>
+<tr><th>#</th><th>Task</th><th>Time</th></tr>
+<tr><td>1</td><td>Site prep + layout; establish 2% grade sloping north</td><td>1 day</td></tr>
+<tr><td>2</td><td>Rubble trench + drain (north trench is lowest point)</td><td>2 days</td></tr>
+<tr><td>3</td><td>Grade beam pour + cure</td><td>2d + 7d</td></tr>
+<tr><td>4</td><td>CMU stem/pony wall (30&Prime;)</td><td>2 days</td></tr>
+<tr><td>5</td><td>Timber frame: sills, posts, ridge beam</td><td>3 days</td></tr>
+<tr><td>6</td><td>Rafters + purlins + sub-frames</td><td>2 days</td></tr>
+<tr><td>7</td><td>N. wall straw-clay infill (3–5 wk dry!)</td><td>2d + dry</td></tr>
+<tr><td>8</td><td>Insulated roof (4&prime; strip)</td><td>1 day</td></tr>
+<tr><td>9</td><td>Glaze south slope</td><td>3 days</td></tr>
+<tr><td>10</td><td>End walls + door + flashing</td><td>2 days</td></tr>
+<tr><td>11</td><td>Plaster + cob mass</td><td>2 days</td></tr>
+<tr><td>12</td><td>Interior: gravel, beds, barrels</td><td>2 days</td></tr>
+</table>
+<h3><span class="b b2">Phase 2</span> &mdash; 4–6 weeks</h3>
+<p>Same sequence. Center wall posts already built. Convert center wall: install Dutch door + fixed glass + vent. Add night curtain track.</p>
+</div>
+
+<!-- COMPARE -->
+<div class="s" id="compare">
+<h2>Comparison &amp; Recommendation</h2>
+<table>
+<tr><th></th><th>Simple</th><th>Thermal (Rec.)</th></tr>
+<tr><td>Winter temp</td><td>Above freezing</td><td style="color:var(--gd);font-weight:bold">+5–10&deg;F warmer</td></tr>
+<tr><td>Additional glass</td><td>~125 ft&sup2;</td><td style="color:var(--gd);font-weight:bold">~100 ft&sup2; (more insul. panels)</td></tr>
+<tr><td>Buildability</td><td style="color:var(--gd);font-weight:bold">Excellent</td><td>Good</td></tr>
+</table>
+<div class="co"><strong>Recommended: Thermal option + Option B glazing.</strong> Phase 1 needs only ~21 ft&sup2; additional glass. The 50&deg; slope on a 12&prime;-wide module is extremely glass-efficient. North wall straw-clay + cob mass + water barrels: estimated 32–38&deg;F on coldest Redmond nights.</div>
+<div class="g2">
+<div><h3><span class="b b1">GH-1 East</span> Warm</h3><p>Propagation, seedlings, tender crops. Min ~32–38&deg;F.</p></div>
+<div><h3><span class="b b2">GH-2 West</span> Cool</h3><p>Hardy crops, curing, overwintering. Min ~28–34&deg;F.</p></div>
+</div>
+</div>
+
+<div style="max-width:1060px;margin:20px auto;padding:10px 28px;text-align:center;color:#999;font-family:sans-serif;font-size:10px">
+Twin Greenhouse &bull; Redmond, WA 47.67&deg;N &bull; 12&prime;&times;12&prime; modules (24&prime;&times;12&prime; total) &bull; No plastic glazing &bull; March 2026
+</div>
+
+<!-- THREE.JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// === GREENHOUSE 3D MODEL ===
+// Dims in feet: module 12(E-W) x 24(N-S)
+// South at +Z, North at -Z, East at +X, West at -X
+// Glass: 8ft horizontal run at 50deg, roof: 4ft strip
+
+const S = 0.3; // scale (feet to world units)
+const container = document.getElementById('viewer');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87AEBF);
+// Fog
+scene.fog = new THREE.FogExp2(0x87AEBF, 0.015);
+
+const camera = new THREE.PerspectiveCamera(50, container.clientWidth/container.clientHeight, 0.1, 200);
+camera.position.set(12*S, 10*S, 14*S);
+
+const renderer = new THREE.WebGLRenderer({antialias:true});
+renderer.setSize(container.clientWidth, container.clientHeight);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+container.appendChild(renderer.domElement);
+
+// Orbit controls (manual since no CDN module)
+let isDragging=false, isRightDrag=false, prevMouse={x:0,y:0};
+let spherical={r:18*S, theta:Math.PI/4, phi:Math.PI/3};
+let target=new THREE.Vector3(0, 5*S, 0);
+let panOffset=new THREE.Vector3();
+
+function updateCamera(){
+  const x=spherical.r*Math.sin(spherical.phi)*Math.sin(spherical.theta);
+  const y=spherical.r*Math.cos(spherical.phi);
+  const z=spherical.r*Math.sin(spherical.phi)*Math.cos(spherical.theta);
+  camera.position.set(x+target.x+panOffset.x, y+target.y+panOffset.y, z+target.z+panOffset.z);
+  camera.lookAt(target.x+panOffset.x, target.y+panOffset.y, target.z+panOffset.z);
+}
+updateCamera();
+
+container.addEventListener('mousedown',e=>{isDragging=true;isRightDrag=e.button===2;prevMouse={x:e.clientX,y:e.clientY};});
+container.addEventListener('contextmenu',e=>e.preventDefault());
+window.addEventListener('mouseup',()=>{isDragging=false;});
+window.addEventListener('mousemove',e=>{
+  if(!isDragging)return;
+  const dx=e.clientX-prevMouse.x, dy=e.clientY-prevMouse.y;
+  prevMouse={x:e.clientX,y:e.clientY};
+  if(isRightDrag){
+    panOffset.x-=dx*0.01;panOffset.y+=dy*0.01;
+  }else{
+    spherical.theta-=dx*0.008;
+    spherical.phi=Math.max(0.2,Math.min(Math.PI-0.2,spherical.phi+dy*0.008));
+  }
+  updateCamera();
+});
+container.addEventListener('wheel',e=>{
+  e.preventDefault();
+  spherical.r=Math.max(5*S,Math.min(60*S,spherical.r+e.deltaY*0.005));
+  updateCamera();
+},{passive:false});
+// Touch
+container.addEventListener('touchstart',e=>{if(e.touches.length===1){isDragging=true;prevMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};}},{passive:true});
+container.addEventListener('touchmove',e=>{if(!isDragging||e.touches.length!==1)return;const dx=e.touches[0].clientX-prevMouse.x,dy=e.touches[0].clientY-prevMouse.y;prevMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};spherical.theta-=dx*0.008;spherical.phi=Math.max(0.2,Math.min(Math.PI-0.2,spherical.phi+dy*0.008));updateCamera();},{passive:true});
+container.addEventListener('touchend',()=>{isDragging=false;},{passive:true});
+
+// Lighting
+scene.add(new THREE.AmbientLight(0xffffff,0.45));
+const sun=new THREE.DirectionalLight(0xfff5e0,0.9);
+sun.position.set(5,15,10);sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+sun.shadow.camera.left=-15;sun.shadow.camera.right=15;sun.shadow.camera.top=15;sun.shadow.camera.bottom=-15;
+scene.add(sun);
+const fill=new THREE.DirectionalLight(0xaaccff,0.25);
+fill.position.set(-8,6,-5);scene.add(fill);
+
+// Materials
+const matStone=new THREE.MeshStandardMaterial({color:0x8C8C8C,roughness:0.9});
+const matTimber=new THREE.MeshStandardMaterial({color:0x9E7A3C,roughness:0.75});
+const matEarth=new THREE.MeshStandardMaterial({color:0xB89B78,roughness:0.85});
+const matStraw=new THREE.MeshStandardMaterial({color:0xD4B896,roughness:0.9});
+const matGlass=new THREE.MeshStandardMaterial({color:0x88ccee,transparent:true,opacity:0.45,roughness:0.05,metalness:0.1,side:THREE.DoubleSide});
+const matGlassFrame=new THREE.MeshStandardMaterial({color:0x6B5B3E,roughness:0.8});
+const matRoof=new THREE.MeshStandardMaterial({color:0x6B5B3E,roughness:0.85});
+const matGround=new THREE.MeshStandardMaterial({color:0x7B9A5F,roughness:1});
+const matPath=new THREE.MeshStandardMaterial({color:0xAA9977,roughness:0.95});
+
+// Ground
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(60*S,60*S),matGround);
+ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
+
+// Helper: box at position
+function box(w,h,d,mat,x,y,z){
+  const m=new THREE.Mesh(new THREE.BoxGeometry(w*S,h*S,d*S),mat);
+  m.position.set(x*S,y*S,z*S);m.castShadow=true;m.receiveShadow=true;return m;
+}
+
+// Phase groups
+const phase1=new THREE.Group();
+const phase2=new THREE.Group();
+scene.add(phase1);scene.add(phase2);
+
+// BUILD ONE MODULE
+// --- SHARED GEOMETRY CONSTANTS ---
+const W=12, D=12;
+const _stemH=2.5, _northH=12.5;
+const _glassRun=8;
+const _glassRise=9.53; // 8*tan(50°)
+const _glassTopY=_stemH+_glassRise; // 12.03
+const _glassSlope=12.43;
+const _glassAngle=50*Math.PI/180;
+const _sZ=D/2;   // +6 south edge
+const _nZ=-D/2;  // -6 north edge
+const _glassEndZ=_sZ-_glassRun; // -2
+const _doorZ=0.5; // door center Z (slightly toward south for headroom)
+const _doorW=3.5; // door width
+const _doorH=7;   // door height
+const _dL=_doorZ-_doorW/2; // -1.25 door left Z
+const _dR=_doorZ+_doorW/2; // 2.25 door right Z
+
+// Wall profile shape (Z→shape X, Y→shape Y — looking from the side)
+function makeWallProfile(){
+  const s=new THREE.Shape();
+  s.moveTo(_sZ*S, 0);
+  s.lineTo(_sZ*S, _stemH*S);
+  s.lineTo(_glassEndZ*S, _glassTopY*S);
+  s.lineTo(_nZ*S, _northH*S);
+  s.lineTo(_nZ*S, 0);
+  s.lineTo(_sZ*S, 0);
+  return s;
+}
+function addDoorHole(shape){
+  const h=new THREE.Path();
+  h.moveTo(_dL*S, 0);
+  h.lineTo(_dL*S, _doorH*S);
+  h.lineTo(_dR*S, _doorH*S);
+  h.lineTo(_dR*S, 0);
+  h.lineTo(_dL*S, 0);
+  shape.holes.push(h);
+}
+
+// Glass wall material (shared by all glass walls)
+const matGlassWall=new THREE.MeshStandardMaterial({
+  color:0x88ccee,transparent:true,opacity:0.4,
+  side:THREE.DoubleSide,roughness:0.05,metalness:0.1
+});
+const matFrame=new THREE.MeshStandardMaterial({color:0x6B5B3E,roughness:0.8});
+
+// Helper: build a glass wall at given X position with door + mullions
+function buildGlassWall(parent, xPos){
+  const shape=makeWallProfile();
+  addDoorHole(shape);
+  const geo=new THREE.ShapeGeometry(shape);
+  const mesh=new THREE.Mesh(geo, matGlassWall);
+  mesh.rotation.y=-Math.PI/2;
+  mesh.position.set(xPos*S, 0, 0);
+  parent.add(mesh);
+
+  // Mullions — vertical bars, skip door zone
+  for(let z=-5;z<=5;z+=2.5){
+    if(z>_dL-0.3 && z<_dR+0.3) continue;
+    let h=_northH;
+    if(z>=_glassEndZ) h=_stemH+(_glassTopY-_stemH)*((_sZ-z)/_glassRun);
+    else h=_glassTopY+(_northH-_glassTopY)*((_glassEndZ-z)/(_glassEndZ-_nZ));
+    h=Math.min(h,_northH);
+    const mg=new THREE.Mesh(new THREE.BoxGeometry(0.1*S,h*S,0.08*S),matFrame);
+    mg.position.set(xPos*S,(h/2)*S,z*S);
+    parent.add(mg);
+  }
+  // Door frame: jambs + header + center mullion (2-pane door)
+  parent.add(box(0.15,_doorH,0.2,matFrame, xPos,_doorH/2,_dL));
+  parent.add(box(0.15,_doorH,0.2,matFrame, xPos,_doorH/2,_dR));
+  parent.add(box(0.15,0.3,_doorW+0.2,matFrame, xPos,_doorH,_doorZ));
+  parent.add(box(0.1,_doorH,0.1,matFrame, xPos,_doorH/2,_doorZ)); // center mullion
+}
+
+// BUILD ONE MODULE
+function buildModule(group, xOffset, outerSide){
+  const cx=xOffset;
+  const outerX = outerSide==='east' ? cx+W/2 : cx-W/2;
+
+  // === FOUNDATION ===
+  // South stem wall — full width
+  group.add(box(W+0.5, _stemH, 0.8, matStone, cx, _stemH/2, _sZ));
+  // North foundation
+  group.add(box(W+0.5, 2, 0.8, matStone, cx, 1, _nZ));
+  // Side foundation at outer wall — SPLIT for doorway gap
+  // North piece: from _nZ to _dL
+  const nPieceLen=_dL-_nZ; // 4.75
+  group.add(box(0.8, _stemH, nPieceLen, matStone, outerX, _stemH/2, (_nZ+_dL)/2));
+  // South piece: from _dR to _sZ
+  const sPieceLen=_sZ-_dR; // 3.75
+  group.add(box(0.8, _stemH, sPieceLen, matStone, outerX, _stemH/2, (_dR+_sZ)/2));
+
+  // === NORTH THERMAL WALL (straw-clay + cob) ===
+  group.add(box(W, _northH, 1.2, matStraw, cx, _northH/2, _nZ-0.6));
+  group.add(box(W, _northH, 0.35, matEarth, cx, _northH/2, _nZ+0.17));
+
+  // === GLASS SLOPE (50° south face) ===
+  const glassGeo=new THREE.PlaneGeometry(W*S, _glassSlope*S);
+  const glassMesh=new THREE.Mesh(glassGeo, matGlass);
+  glassMesh.position.set(cx*S, ((_stemH+_glassTopY)/2)*S, ((_sZ+_glassEndZ)/2)*S);
+  glassMesh.rotation.x=-(Math.PI/2-_glassAngle);
+  group.add(glassMesh);
+  // Vertical mullions on slope
+  for(let i=-W/2+3;i<W/2;i+=3){
+    const m=new THREE.Mesh(new THREE.BoxGeometry(0.12*S,_glassSlope*S,0.08*S),matGlassFrame);
+    m.position.copy(glassMesh.position);m.position.x=(cx+i)*S;
+    m.rotation.x=glassMesh.rotation.x;group.add(m);
+  }
+  // Horizontal mullions on slope
+  for(let j=1;j<=3;j++){
+    const f=j/4;
+    const m=new THREE.Mesh(new THREE.BoxGeometry(W*S,0.1*S,0.08*S),matGlassFrame);
+    m.position.set(cx*S, (_stemH+f*_glassRise)*S, (_sZ-f*_glassRun)*S);
+    m.rotation.x=glassMesh.rotation.x;group.add(m);
+  }
+
+  // === INSULATED ROOF STRIP ===
+  const roofLen=Math.sqrt(16+0.22);
+  const roofGeo=new THREE.PlaneGeometry(W*S, roofLen*S);
+  const roofMesh=new THREE.Mesh(roofGeo, matRoof);
+  roofMesh.position.set(cx*S, ((_glassTopY+_northH)/2)*S, ((_glassEndZ+_nZ)/2)*S);
+  roofMesh.rotation.x=-Math.PI/2+Math.atan2(0.47,4);
+  group.add(roofMesh);
+  group.add(box(W+0.3, 0.55, 0.5, matTimber, cx, _glassTopY, _glassEndZ)); // ridge beam
+  group.add(box(W+0.3, 0.55, 0.5, matTimber, cx, _northH, _nZ)); // north plate
+
+  // === OUTER END WALL — GLASS with door ===
+  buildGlassWall(group, outerX);
+
+  // === CORNER POSTS ===
+  group.add(box(0.5,_stemH+0.5,0.5,matTimber, cx+W/2-0.3,(_stemH+0.5)/2,_sZ-0.3));
+  group.add(box(0.5,_stemH+0.5,0.5,matTimber, cx-W/2+0.3,(_stemH+0.5)/2,_sZ-0.3));
+  group.add(box(0.5,_northH,0.5,matTimber, cx+W/2-0.3,_northH/2,_nZ+0.5));
+  group.add(box(0.5,_northH,0.5,matTimber, cx-W/2+0.3,_northH/2,_nZ+0.5));
+
+  // === WATER BARRELS along north wall (3 per module) ===
+  const bGeo=new THREE.CylinderGeometry(0.85*S,0.85*S,2.6*S,12);
+  const bMat2=new THREE.MeshStandardMaterial({color:0x1565C0,roughness:0.6,metalness:0.2});
+  for(let bx=-3;bx<=3;bx+=3){
+    const b=new THREE.Mesh(bGeo,bMat2);
+    b.position.set((cx+bx)*S,1.3*S,(_nZ+2)*S);
+    b.castShadow=true;group.add(b);
+  }
+
+  // === RECTANGULAR MOUNDS — both sides of path ===
+  const mMat=new THREE.MeshStandardMaterial({color:0x4E3524,roughness:1});
+  const gMat=new THREE.MeshStandardMaterial({color:0x2E7D32,roughness:0.9});
+
+  // SOUTH mounds (between path and south wall, under glass)
+  // Two beds per module, flanking center E-W
+  for(let side of [-1,1]){
+    // Soil mound: 4ft(E-W) x 3ft(N-S) x 0.5ft tall
+    group.add(box(4, 0.5, 3, mMat, cx+side*3, 0.25, 3.5));
+    // Green top (plants)
+    group.add(box(3.6, 0.12, 2.6, gMat, cx+side*3, 0.56, 3.5));
+  }
+
+  // NORTH mounds (between path and water barrels)
+  // Narrower beds fitting between path (~Z=-0.5) and barrels (~Z=-4)
+  for(let side of [-1,1]){
+    // Soil mound: 4ft(E-W) x 2ft(N-S) x 0.5ft tall
+    group.add(box(4, 0.5, 2, mMat, cx+side*3, 0.25, -1.8));
+    group.add(box(3.6, 0.12, 1.6, gMat, cx+side*3, 0.56, -1.8));
+  }
+
+  // Small mounds BETWEEN water barrels (at north wall)
+  // Barrels are at bx = cx-3, cx, cx+3 → gaps at cx-1.5 and cx+1.5
+  for(let bx of [-1.5, 1.5]){
+    group.add(box(1.5, 0.4, 1.5, mMat, cx+bx, 0.2, (_nZ+2)));
+    group.add(box(1.2, 0.1, 1.2, gMat, cx+bx, 0.45, (_nZ+2)));
+  }
+}
+
+// Build modules
+buildModule(phase1, 6, 'east');
+buildModule(phase2, -6, 'west');
+
+// === CENTER GLASS WALL at X=0 (always visible) ===
+buildGlassWall(scene, 0);
+
+// === CONTINUOUS PATH — one strip running E-W through all doorways ===
+// Runs from east door (x=13) through center (x=0) to west door (x=-13)
+// At Z = _doorZ = 0.5, width 2.5ft
+scene.add(box(28, 0.08, 2.5, matPath, 0, 0.04, _doorZ));
+
+// Compass
+const compassGeo=new THREE.RingGeometry(6*S,6.15*S,32);
+const compassMesh=new THREE.Mesh(compassGeo, new THREE.MeshBasicMaterial({color:0xffffff,side:THREE.DoubleSide}));
+compassMesh.rotation.x=-Math.PI/2;compassMesh.position.y=0.02;
+scene.add(compassMesh);
+const arrowGeo=new THREE.ConeGeometry(0.25*S,1*S,4);
+const arrow=new THREE.Mesh(arrowGeo, new THREE.MeshBasicMaterial({color:0xff3300}));
+arrow.position.set(0,0.4*S,-7.5*S);arrow.rotation.x=Math.PI/2;
+scene.add(arrow);
+
+// Labels
+function makeLabel(text,x,y,z,color){
+  const c=document.createElement('canvas');c.width=512;c.height=64;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle=color||'#fff';ctx.font='bold 28px sans-serif';ctx.textAlign='center';
+  ctx.fillText(text,256,40);
+  const tex=new THREE.CanvasTexture(c);
+  const sp=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,transparent:true}));
+  sp.scale.set(4*S,0.6*S,1);sp.position.set(x*S,y*S,z*S);
+  return sp;
+}
+scene.add(makeLabel('PHASE 1 (East)',6,14.5,0,'#88ff88'));
+scene.add(makeLabel('PHASE 2 (West)',-6,14.5,0,'#88ccff'));
+scene.add(makeLabel('N',0,0.8,-8,'#ff4400'));
+scene.add(makeLabel('S',0,0.8,8,'#ffffff'));
+scene.add(makeLabel('SOUTH — Glass 50°',0,1.5,8.5,'#aaddff'));
+scene.add(makeLabel('NORTH — Thermal Wall',0,14,-8,'#ddbb88'));
+
+// View presets
+function viewPreset(v){
+  panOffset.set(0,0,0);
+  if(v==='se'){spherical={r:18*S,theta:Math.PI/4,phi:Math.PI/3};}
+  else if(v==='south'){spherical={r:16*S,theta:0,phi:Math.PI/3};}
+  else if(v==='east'){spherical={r:14*S,theta:Math.PI/2,phi:Math.PI/3};}
+  else if(v==='top'){spherical={r:16*S,theta:0.1,phi:0.3};}
+  else if(v==='inside'){spherical={r:6*S,theta:Math.PI/5,phi:Math.PI/2.5};panOffset.set(1.5*S,0,0);}
+  updateCamera();
+}
+
+let phase2Visible=true;
+function togglePhase(){
+  phase2Visible=!phase2Visible;
+  phase2.visible=phase2Visible;
+}
+
+// Animate
+function animate(){requestAnimationFrame(animate);renderer.render(scene,camera);}
+animate();
+
+// Resize
+window.addEventListener('resize',()=>{
+  camera.aspect=container.clientWidth/container.clientHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(container.clientWidth,container.clientHeight);
+});
+
+// Smooth scroll nav
+document.querySelectorAll('nav a').forEach(a=>a.addEventListener('click',e=>{
+  e.preventDefault();
+  const t=document.querySelector(a.getAttribute('href'));
+  if(t)t.scrollIntoView({behavior:'smooth',block:'start'});
+}));
+</script>
+</body>
+</html>
