@@ -42,7 +42,7 @@ tr:nth-child(even){background:var(--hi)}
 <body>
 
 <nav>
-<a href="#model">3D Model</a><a href="#dims">Dimensions</a><a href="#plans">Plans</a><a href="#section">Section</a><a href="#glazing">Glazing</a><a href="#options">Options</a><a href="#materials">Materials</a><a href="#cutlist">Cut List</a><a href="#build">Build</a><a href="#compare">Compare</a>
+<a href="#model">3D Model</a><a href="#dims">Dimensions</a><a href="#glass">Glass Inventory</a><a href="#materials">Materials</a><a href="#cutlist">Cut List</a><a href="#build">Build</a>
 </nav>
 
 <!-- 3D MODEL -->
@@ -92,48 +92,10 @@ tr:nth-child(even){background:var(--hi)}
 </div>
 </div>
 
-<!-- PLANS -->
-<div class="s" id="plans">
-<h2>Floor Plan</h2>
-<p>Each 12&prime;&times;12&prime; module is entirely under the slope: 8&prime; glass run + 4&prime; insulated roof = full 12&prime; N-S depth. North thermal wall at the back. Water barrels along north wall. Direct in-ground growing on mounds (no raised beds). Grade slopes gently north for drainage to rubble trench. Center wall between modules is glass with a 2-pane window/door opening.</p>
-<div class="g2">
-<div>
-<h3><span class="b b1">Phase 1 (East)</span></h3>
-<p>Standalone 12&prime;&times;12&prime;. Best glass on south slope. Patio door on east end. West end = pre-framed for Phase 2 center glass wall connection.</p>
-</div>
-<div>
-<h3><span class="b b2">Phase 2 (West)</span></h3>
-<p>Joins at center. Screen door on west end. Center wall = full glass with 2-pane window/door opening between greenhouses.</p>
-</div>
-</div>
-</div>
 
-<!-- SECTION -->
-<div class="s" id="section">
-<h2>Building Section</h2>
-<p>Looking east through one module. South at right, north at left. Grade drops ~3&Prime; over 12&prime; toward north wall rubble trench.</p>
-<table>
-<tr><th>Zone (S to N)</th><th>Depth</th><th>Above</th><th>Below</th></tr>
-<tr><td>South stem wall</td><td class="n">0&prime;</td><td>30&Prime; CMU pony wall</td><td>Grade beam + rubble trench</td></tr>
-<tr><td>Glass slope</td><td class="n">0–8&prime;</td><td>50&deg; glass plane (12.4&prime; long)</td><td>In-ground mounds, path</td></tr>
-<tr><td>Insulated roof</td><td class="n">8–12&prime;</td><td>4&prime; timber roof, R-30</td><td>Water barrels along N wall</td></tr>
-<tr><td>North thermal wall</td><td class="n">12&prime;</td><td>12.5&prime; straw-clay + 4&Prime; cob interior</td><td>Rubble trench (drainage collects here)</td></tr>
-</table>
-<h3>Foundation</h3>
-<table>
-<tr><th>Component</th><th>Spec</th><th>Qty / Module</th></tr>
-<tr><td>Rubble trench</td><td>18&Prime;&times;18&Prime;, 3/4&Prime; washed rock</td><td>48 LF, ~2.5 cu yd</td></tr>
-<tr><td>Drain pipe</td><td>4&Prime; perf. HDPE w/ sock</td><td>56 LF</td></tr>
-<tr><td>Grade beam</td><td>12&Prime;&times;8&Prime;, 3000 psi</td><td>48 LF = ~1 cu yd</td></tr>
-<tr><td>CMU stem wall</td><td>8&Prime; CMU, 3.5 courses (30&Prime;)</td><td>~72 blocks</td></tr>
-<tr><td>Sill plate</td><td>6&times;6 PT Doug fir</td><td>48 LF</td></tr>
-<tr><td>Anchor bolts</td><td>1/2&Prime;&times;10&Prime; J-bolt @ 4&prime; o.c.</td><td>12 ea</td></tr>
-</table>
-</div>
-
-<!-- GLAZING -->
-<div class="s" id="glazing">
-<h2>Glazing Schedule</h2>
+<!-- GLASS INVENTORY -->
+<div class="s" id="glass">
+<h2>Glass Inventory</h2>
 <table>
 <tr><th>ID</th><th>Piece</th><th>Qty</th><th>Size</th><th>Area</th></tr>
 <tr><td>LGW</td><td>Large GH Windows</td><td class="n">3</td><td>80&Prime;&times;5&prime;</td><td class="n">100.0</td></tr>
@@ -150,7 +112,7 @@ tr:nth-child(even){background:var(--hi)}
 <h3>Requirements</h3>
 <table>
 <tr><th></th><th>/ Module</th><th>Both</th></tr>
-<tr><td>South slope glass</td><td class="n">149 ft&sup2;</td><td class="n">298 ft&sup2;</td></tr>
+<tr><td>South slope</td><td class="n">149 ft&sup2;</td><td class="n">298 ft&sup2;</td></tr>
 <tr><td>Center glass wall</td><td class="n">~60 ft&sup2;</td><td class="n">~60 ft&sup2;</td></tr>
 <tr><td>End walls + doors</td><td class="n">~20 ft&sup2;</td><td class="n">~40 ft&sup2;</td></tr>
 <tr style="font-weight:bold;background:var(--hi)"><td>TOTAL NEEDED</td><td class="n">~169 ft&sup2;</td><td class="n">~398 ft&sup2;</td></tr>
@@ -158,30 +120,9 @@ tr:nth-child(even){background:var(--hi)}
 <tr><td>Doors (access openings)</td><td colspan="2" class="n">40 ft&sup2;</td></tr>
 <tr style="font-weight:bold;background:#FFF3E0"><td>ADDITIONAL GLASS</td><td colspan="2" class="n">~125 ft&sup2;</td></tr>
 </table>
-<div class="co"><strong>The 50&deg; steep slope + 12&prime; width dramatically reduces glass needs.</strong> Only ~125 ft&sup2; additional glass for the entire complex. Center wall is all glass with a 2-pane door opening. With Option B, Phase 1 needs almost zero additional glass.</div>
+<div class="co"><strong>The 50&deg; steep slope + 12&prime; width dramatically reduces glass needs.</strong> Only ~125 ft&sup2; additional glass for the entire complex. Center wall is all glass with a 2-pane door opening.</div>
 </div>
 
-<!-- OPTIONS -->
-<div class="s" id="options">
-<h2>Glazing Allocation</h2>
-<div class="g2">
-<div>
-<h3>Option A &mdash; Balanced</h3>
-<h4><span class="b b1">P1</span></h4>
-<p>LGW-1, CDP, BPP, SD-1, NP-1 + SPD (door)<br>Existing on slope: ~108 ft&sup2; &rarr; Addl: ~81 ft&sup2;</p>
-<h4><span class="b b2">P2</span></h4>
-<p>LGW-2, LGW-3, SMGW, SPP, SD-2, NP-2 + WSD (door)<br>Existing on slope: ~97 ft&sup2; &rarr; Addl: ~52 ft&sup2;</p>
-</div>
-<div>
-<h3>Option B &mdash; Front-Loaded (Rec.)</h3>
-<h4><span class="b b1">P1</span></h4>
-<p>LGW-1, LGW-2, CDP, SMGW, BPP, SPP, SD-1, NP-1 + SPD<br>Existing on slope: <strong>168 ft&sup2;</strong> &rarr; <strong>Addl: ~21 ft&sup2; only!</strong></p>
-<h4><span class="b b2">P2</span></h4>
-<p>LGW-3, SD-2, NP-2 + WSD<br>Existing on slope: ~37 ft&sup2; &rarr; Addl: ~112 ft&sup2;</p>
-</div>
-</div>
-<div class="co"><strong>Option B:</strong> Phase 1 is nearly complete from existing inventory alone&mdash;only ~21 ft&sup2; shortfall (one small salvaged pane). Phase 2 needs ~112 ft&sup2; additional, sourceable over time.</div>
-</div>
 
 <!-- MATERIALS -->
 <div class="s" id="materials">
@@ -196,7 +137,7 @@ tr:nth-child(even){background:var(--hi)}
 <tr><td>Roof rafters (insul.)</td><td>2&times;8 &times; 5&prime;</td><td>7</td></tr>
 <tr><td>Glass slope rafters</td><td>2&times;8 &times; 14&prime;</td><td>7</td></tr>
 <tr><td>Purlins</td><td>2&times;4 &times; 12&prime;</td><td>10</td></tr>
-<tr><td>Glazing sub-frames</td><td>2&times;4</td><td>~16 pcs</td></tr>
+<tr><td>Glass sub-frames</td><td>2&times;4</td><td>~16 pcs</td></tr>
 <tr><td>N. wall studs</td><td>2&times;6 &times; 12.5&prime;</td><td>7</td></tr>
 <tr><td>Bracing</td><td>2&times;6 &times; 10&prime;</td><td>6</td></tr>
 </table>
@@ -209,7 +150,7 @@ tr:nth-child(even){background:var(--hi)}
 <tr><td>Roof insulation R-30</td><td>48 ft&sup2;</td></tr>
 <tr><td>55-gal water barrels</td><td>3</td></tr>
 </table>
-<h3>Glazing Hardware</h3>
+<h3>Glass Hardware</h3>
 <table>
 <tr><th>Item</th><th>Qty</th></tr>
 <tr><td>Linseed putty</td><td>2 gal</td></tr>
@@ -242,7 +183,7 @@ tr:nth-child(even){background:var(--hi)}
 <tr><td>R-1</td><td>2&times;8</td><td>5&prime;</td><td>7</td><td>Insul. roof rafters</td></tr>
 <tr><td>R-2</td><td>2&times;8</td><td>14&prime;</td><td>7</td><td>Glass slope rafters (50&deg;)</td></tr>
 <tr><td>PU</td><td>2&times;4</td><td>12&prime;</td><td>10</td><td>Purlins</td></tr>
-<tr><td>GF</td><td>2&times;4</td><td>varies</td><td>~16</td><td>Glazing sub-frames</td></tr>
+<tr><td>GF</td><td>2&times;4</td><td>varies</td><td>~16</td><td>Glass sub-frames</td></tr>
 <tr><td>ST</td><td>2&times;6</td><td>12.5&prime;</td><td>7</td><td>N. wall studs</td></tr>
 <tr><td>BR</td><td>2&times;6</td><td>10&prime;</td><td>6</td><td>Bracing</td></tr>
 </table>
@@ -271,24 +212,9 @@ tr:nth-child(even){background:var(--hi)}
 <p>Same sequence. Center wall posts already built. Convert center wall: install Dutch door + fixed glass + vent. Add night curtain track.</p>
 </div>
 
-<!-- COMPARE -->
-<div class="s" id="compare">
-<h2>Comparison &amp; Recommendation</h2>
-<table>
-<tr><th></th><th>Simple</th><th>Thermal (Rec.)</th></tr>
-<tr><td>Winter temp</td><td>Above freezing</td><td style="color:var(--gd);font-weight:bold">+5–10&deg;F warmer</td></tr>
-<tr><td>Additional glass</td><td>~125 ft&sup2;</td><td style="color:var(--gd);font-weight:bold">~100 ft&sup2; (more insul. panels)</td></tr>
-<tr><td>Buildability</td><td style="color:var(--gd);font-weight:bold">Excellent</td><td>Good</td></tr>
-</table>
-<div class="co"><strong>Recommended: Thermal option + Option B glazing.</strong> Phase 1 needs only ~21 ft&sup2; additional glass. The 50&deg; slope on a 12&prime;-wide module is extremely glass-efficient. North wall straw-clay + cob mass + water barrels: estimated 32–38&deg;F on coldest Redmond nights.</div>
-<div class="g2">
-<div><h3><span class="b b1">GH-1 East</span> Warm</h3><p>Propagation, seedlings, tender crops. Min ~32–38&deg;F.</p></div>
-<div><h3><span class="b b2">GH-2 West</span> Cool</h3><p>Hardy crops, curing, overwintering. Min ~28–34&deg;F.</p></div>
-</div>
-</div>
 
 <div style="max-width:1060px;margin:20px auto;padding:10px 28px;text-align:center;color:#999;font-family:sans-serif;font-size:10px">
-Twin Greenhouse &bull; Redmond, WA 47.67&deg;N &bull; 12&prime;&times;12&prime; modules (24&prime;&times;12&prime; total) &bull; No plastic glazing &bull; March 2026
+Twin Greenhouse &bull; Redmond, WA 47.67&deg;N &bull; 12&prime;&times;12&prime; modules (24&prime;&times;12&prime; total) &bull; All natural materials &bull; March 2026
 </div>
 
 <!-- THREE.JS -->
