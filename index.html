@@ -697,66 +697,70 @@ function buildPhase1SouthSlope(parent, cx){
   const sinA=Math.sin(_glassAngle);
   const cosA=Math.cos(_glassAngle);
   const woodMat=new THREE.MeshStandardMaterial({color:0x9E7A3C, roughness:0.75});
+  const darkWoodMat=new THREE.MeshStandardMaterial({color:0x6B5B3E, roughness:0.8});
 
-  // Helper: place a slope-aligned wood member
-  // vCenter=across slope (E-W), uCenter=along slope from bottom, uLen=length along slope
-  // vWidth=width across slope, depth=thickness perpendicular to slope surface
-  function slopeWood(vCenter, uCenter, uLen, vWidth, depth){
+  // Helper: place a thin slope-aligned wood plank
+  function slopeWood(vCenter, uCenter, uLen, vWidth, depth, mat){
     const geo=new THREE.BoxGeometry(vWidth*S, uLen*S, depth*S);
-    const m=new THREE.Mesh(geo, woodMat);
+    const m=new THREE.Mesh(geo, mat||woodMat);
     m.position.set(vCenter*S, (_stemH+uCenter*sinA)*S, (_sZ-uCenter*cosA)*S);
     m.rotation.x=-(Math.PI/2-_glassAngle);
     parent.add(m);
-    return m;
   }
 
-  // ─── BOTTOM ROW glass (u=0.2 to 5.2, uCenter=2.7, uLen=5) ───
-  // Layout from draw.io left→right:
-  //   2×8 | 2×6+2×6 | NP2(1') | 2×6+2×6 | LGW#3(6.67') | 2×6+2×6 | NP1(1') | 2×6+2×6 | 2×8
-  // Glass edges: LGW#3 at cx±3.335, NP at cx±(3.6 to 4.6)
-  addSlopeGlassPane(parent, 2.7, cx+0, 5, 6.67, true);    // LGW#3 center
-  addSlopeGlassPane(parent, 2.7, cx+4.1, 5, 1, false);     // NP1 east
-  addSlopeGlassPane(parent, 2.7, cx-4.1, 5, 1, false);     // NP2 west
+  // === EXACT EDGE MATH ===
+  // LGW#3: 6.67' wide at cx → edges cx±3.335
+  // NP1: 1' wide at cx+4.1 → edges cx+3.6 to cx+4.6
+  // NP2: 1' wide at cx-4.1 → edges cx-4.6 to cx-3.6
+  // Inner gap (LGW↔NP): 0.265' each side
+  // Outer gap (NP↔module edge): 1.4' each side → 3 boards: 0.45+0.45+0.50=1.4
 
-  // 2×6 pairs between LGW#3 and NPs (gap=0.265', pair fills it)
-  slopeWood(cx-3.468, 2.7, 5, 0.26, 0.42);  // left pair: LGW#3 ↔ NP2
-  slopeWood(cx+3.468, 2.7, 5, 0.26, 0.42);  // right pair: LGW#3 ↔ NP1
+  // ─── BOTTOM ROW (uCenter=2.7, uLen=5) ───
+  addSlopeGlassPane(parent, 2.7, cx+0, 5, 6.67, true);    // LGW#3
+  addSlopeGlassPane(parent, 2.7, cx+4.1, 5, 1, false);     // NP1
+  addSlopeGlassPane(parent, 2.7, cx-4.1, 5, 1, false);     // NP2
 
-  // 2×6 pairs between NP outer edges and outer rafters
-  // NP outer edges at cx±4.6, outer rafters at cx±5.75
-  // These fill the gap between NP and the edge 2×8
-  slopeWood(cx-5.05, 2.7, 5, 0.35, 0.42);   // left pair: NP2 ↔ outer edge
-  slopeWood(cx+5.05, 2.7, 5, 0.35, 0.42);   // right pair: NP1 ↔ outer edge
+  // Inner 2×6 pairs: exactly fill 0.265' gap between LGW#3 and NPs
+  slopeWood(cx-3.4675, 2.7, 5, 0.265, 0.12, darkWoodMat);
+  slopeWood(cx+3.4675, 2.7, 5, 0.265, 0.12, darkWoodMat);
 
-  // 2×8 outer edge rafters (bottom row)
-  slopeWood(cx-W/2+0.25, 2.7, 5, 0.5, 0.6);   // left outer 2×8
-  slopeWood(cx+W/2-0.25, 2.7, 5, 0.5, 0.6);   // right outer 2×8
+  // Outer gap boards: 3 boards per side filling cx±4.6 to cx±6.0 (1.4' total)
+  // Board 1 (2×6): 0.45' wide, center at cx±4.825
+  slopeWood(cx-4.825, 2.7, 5, 0.45, 0.12, darkWoodMat);
+  slopeWood(cx+4.825, 2.7, 5, 0.45, 0.12, darkWoodMat);
+  // Board 2 (2×6): 0.45' wide, center at cx±5.275
+  slopeWood(cx-5.275, 2.7, 5, 0.45, 0.12, darkWoodMat);
+  slopeWood(cx+5.275, 2.7, 5, 0.45, 0.12, darkWoodMat);
+  // Board 3 (2×8 edge rafter): 0.50' wide, center at cx±5.75
+  slopeWood(cx-5.75, 2.7, 5, 0.50, 0.125);
+  slopeWood(cx+5.75, 2.7, 5, 0.50, 0.125);
 
-  // ─── HORIZONTAL 2×8 RAIL between bottom and top rows (u≈5.35) ───
-  slopeWood(cx, 5.35, 0.6, W, 0.6);
+  // ─── HORIZONTAL 2×8 RAIL between rows (u≈5.35) ───
+  slopeWood(cx, 5.35, 0.25, W, 0.125);
 
-  // ─── TOP ROW glass (u=5.5 to 12.17, uCenter=8.835, uLen=6.67) ───
-  // Layout: 2×8 | LGW#1(5') | 2×8 | LGW#2(5') | 2×8
-  addSlopeGlassPane(parent, 8.835, cx-2.65, 6.67, 5, true);  // LGW#1 west
-  addSlopeGlassPane(parent, 8.835, cx+2.65, 6.67, 5, true);  // LGW#2 east
+  // ─── TOP ROW (uCenter=8.835, uLen=6.67) ───
+  // LGW#1: 5' wide at cx-2.65 → edges cx-5.15 to cx-0.15
+  // LGW#2: 5' wide at cx+2.65 → edges cx+0.15 to cx+5.15
+  // Center gap: 0.3', edge gaps: 0.85' each
+  addSlopeGlassPane(parent, 8.835, cx-2.65, 6.67, 5, true);  // LGW#1
+  addSlopeGlassPane(parent, 8.835, cx+2.65, 6.67, 5, true);  // LGW#2
 
-  // 2×8 center mullion between LGW#1 and LGW#2
-  slopeWood(cx, 8.835, 6.67, 0.5, 0.6);
+  // Center 2×8 mullion: exactly fills 0.3' gap
+  slopeWood(cx, 8.835, 6.67, 0.3, 0.125);
 
-  // 2×8 outer edge rafters (top row)
-  slopeWood(cx-5.4, 8.835, 6.67, 0.5, 0.6);   // left
-  slopeWood(cx+5.4, 8.835, 6.67, 0.5, 0.6);   // right
+  // Edge 2×8 rafters: exactly fill 0.85' gap each
+  slopeWood(cx-5.575, 8.835, 6.67, 0.85, 0.125);
+  slopeWood(cx+5.575, 8.835, 6.67, 0.85, 0.125);
 
-  // ─── TOP BLOCKING: 2×4 boards above LGW#1 & LGW#2 at ridge ───
-  // Three 2×4 pieces spanning each LGW width (80" = 6.67')
+  // ─── TOP BLOCKING: 2×4 boards at ridge ───
   const uBlock=12.35;
-  slopeWood(cx-2.65, uBlock, 0.29, 5, 0.29);     // over LGW#1
-  slopeWood(cx+2.65, uBlock, 0.29, 5, 0.29);     // over LGW#2
-  slopeWood(cx-2.65, uBlock+0.32, 0.29, 5, 0.29); // 2nd layer LGW#1
-  slopeWood(cx+2.65, uBlock+0.32, 0.29, 5, 0.29); // 2nd layer LGW#2
+  slopeWood(cx-2.65, uBlock, 0.29, 5, 0.12, darkWoodMat);
+  slopeWood(cx+2.65, uBlock, 0.29, 5, 0.12, darkWoodMat);
+  slopeWood(cx-2.65, uBlock+0.32, 0.29, 5, 0.12, darkWoodMat);
+  slopeWood(cx+2.65, uBlock+0.32, 0.29, 5, 0.12, darkWoodMat);
 
-  // ─── BOTTOM PURLIN (2×8 at u=0.1, where glass meets pony wall) ───
-  slopeWood(cx, 0.1, 0.5, W, 0.6);
+  // ─── BOTTOM PURLIN (at u=0.1, where glass meets pony wall) ───
+  slopeWood(cx, 0.1, 0.25, W, 0.5);
 }
 
 // === BUILD PHASE 1 EAST END WALL (at x=12) ===
