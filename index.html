@@ -388,6 +388,9 @@ const matGlassFrame=new THREE.MeshStandardMaterial({color:0x6B5B3E,roughness:0.8
 const matRoof=new THREE.MeshStandardMaterial({color:0x6B5B3E,roughness:0.85});
 const matGround=new THREE.MeshStandardMaterial({color:0x7B9A5F,roughness:1});
 const matPath=new THREE.MeshStandardMaterial({color:0xAA9977,roughness:0.95});
+const matGrill=new THREE.MeshStandardMaterial({color:0x333333,roughness:0.9});
+const matPonyWall=new THREE.MeshStandardMaterial({color:0x8C8C8C,roughness:0.9});
+const matDoorGlass=new THREE.MeshStandardMaterial({color:0x77bbdd,transparent:true,opacity:0.5,roughness:0.08,metalness:0.05,side:THREE.DoubleSide});
 
 // Ground
 const ground=new THREE.Mesh(new THREE.PlaneGeometry(60*S,60*S),matGround);
@@ -472,6 +475,285 @@ function buildGlassWall(parent, xPos){
   parent.add(box(0.1,_doorH,0.1,matFrame, xPos,_doorH/2,_doorZ));
 }
 
+// === HELPER: Create a glass pane in slope coordinates ===
+function addSlopeGlassPane(parent, uCenter, vCenter, uSize, vSize, withGrills){
+  // u = distance along slope from bottom (at stem wall)
+  // v = cross-slope position (width), centered at v=0
+  // Convert to world coords:
+  // position along slope direction (south->north, up)
+  const sinA=Math.sin(_glassAngle);
+  const cosA=Math.cos(_glassAngle);
+  const worldY=_stemH+uCenter*sinA;
+  const worldZ=_sZ-uCenter*cosA;
+
+  // Create geometry for pane
+  const geoW=vSize*S;
+  const geoH=uSize*S;
+  const geo=new THREE.PlaneGeometry(geoW, geoH);
+  const mesh=new THREE.Mesh(geo, matGlass);
+
+  // Position at center of pane
+  mesh.position.set(vCenter*S, worldY*S, worldZ*S);
+  // Rotate to slope angle
+  mesh.rotation.x=-(Math.PI/2-_glassAngle);
+  parent.add(mesh);
+
+  // Add frame around perimeter
+  const frameThickness=0.04; // feet
+  const frameColor=0x6B5B3E;
+  const frameMat=new THREE.MeshStandardMaterial({color:frameColor, roughness:0.8});
+
+  // Top frame
+  const topGeo=new THREE.BoxGeometry(geoW+frameThickness*2*S, frameThickness*S, 0.08*S);
+  const topMesh=new THREE.Mesh(topGeo, frameMat);
+  topMesh.position.copy(mesh.position);
+  topMesh.position.y+=(uSize/2)*S;
+  topMesh.rotation.x=mesh.rotation.x;
+  parent.add(topMesh);
+
+  // Bottom frame
+  const botMesh=topMesh.clone();
+  botMesh.position.y-=uSize*S;
+  parent.add(botMesh);
+
+  // Left frame
+  const leftGeo=new THREE.BoxGeometry(frameThickness*S, geoH+frameThickness*2*S, 0.08*S);
+  const leftMesh=new THREE.Mesh(leftGeo, frameMat);
+  leftMesh.position.copy(mesh.position);
+  leftMesh.position.x-=(vSize/2)*S;
+  leftMesh.rotation.x=mesh.rotation.x;
+  parent.add(leftMesh);
+
+  // Right frame
+  const rightMesh=leftMesh.clone();
+  rightMesh.position.x+=(vSize)*S;
+  parent.add(rightMesh);
+
+  // Add grills if requested (3x3 grid = 9 sub-panels)
+  if(withGrills){
+    // Vertical grills (divide width into thirds)
+    for(let vi=1; vi<=2; vi++){
+      const vPos=vCenter-vSize/2+vi*(vSize/3);
+      const gridGeo=new THREE.BoxGeometry(0.04*S, geoH, 0.03*S);
+      const gridMesh=new THREE.Mesh(gridGeo, matGrill);
+      gridMesh.position.copy(mesh.position);
+      gridMesh.position.x=vPos*S;
+      gridMesh.rotation.x=mesh.rotation.x;
+      parent.add(gridMesh);
+    }
+
+    // Horizontal grills (divide height into thirds, which is along slope)
+    for(let ui=1; ui<=2; ui++){
+      const uPos=uCenter-uSize/2+ui*(uSize/3);
+      const hWorldY=_stemH+uPos*sinA;
+      const hWorldZ=_sZ-uPos*cosA;
+      const gridGeo=new THREE.BoxGeometry(geoW, 0.04*S, 0.03*S);
+      const gridMesh=new THREE.Mesh(gridGeo, matGrill);
+      gridMesh.position.set(vCenter*S, hWorldY*S, hWorldZ*S);
+      gridMesh.rotation.x=mesh.rotation.x;
+      parent.add(gridMesh);
+    }
+  }
+}
+
+// === HELPER: Create a pane at fixed x position (end/center wall), in YZ plane ===
+function addWallPane(parent, xPos, zCenter, yCenter, zSize, ySize, withGrills){
+  // Glass pane in YZ plane at fixed x
+  const geo=new THREE.PlaneGeometry(zSize*S, ySize*S);
+  const mesh=new THREE.Mesh(geo, matGlass);
+  mesh.position.set(xPos*S, yCenter*S, zCenter*S);
+  mesh.rotation.y=Math.PI/2; // face outward (east/west)
+  parent.add(mesh);
+
+  // Frame around perimeter
+  const frameThickness=0.04;
+  const frameMat=new THREE.MeshStandardMaterial({color:0x6B5B3E, roughness:0.8});
+
+  // Top frame (Y direction)
+  const topGeo=new THREE.BoxGeometry(zSize*S+frameThickness*2*S, frameThickness*S, 0.08*S);
+  const topMesh=new THREE.Mesh(topGeo, frameMat);
+  topMesh.position.set(xPos*S, yCenter*S+ySize/2*S, zCenter*S);
+  topMesh.rotation.y=Math.PI/2;
+  parent.add(topMesh);
+
+  // Bottom frame
+  const botMesh=topMesh.clone();
+  botMesh.position.y-=ySize*S;
+  parent.add(botMesh);
+
+  // Left frame (Z direction)
+  const leftGeo=new THREE.BoxGeometry(frameThickness*S, ySize*S+frameThickness*2*S, 0.08*S);
+  const leftMesh=new THREE.Mesh(leftGeo, frameMat);
+  leftMesh.position.set(xPos*S, yCenter*S, zCenter*S-zSize/2*S);
+  leftMesh.rotation.y=Math.PI/2;
+  parent.add(leftMesh);
+
+  // Right frame
+  const rightMesh=leftMesh.clone();
+  rightMesh.position.z+=zSize*S;
+  parent.add(rightMesh);
+
+  if(withGrills){
+    // Vertical grills (Z direction, 3 divisions)
+    for(let zi=1; zi<=2; zi++){
+      const zPos=zCenter-zSize/2+zi*(zSize/3);
+      const gridGeo=new THREE.BoxGeometry(0.03*S, ySize*S, 0.04*S);
+      const gridMesh=new THREE.Mesh(gridGeo, matGrill);
+      gridMesh.position.set(xPos*S, yCenter*S, zPos*S);
+      gridMesh.rotation.y=Math.PI/2;
+      parent.add(gridMesh);
+    }
+
+    // Horizontal grills (Y direction, 3 divisions)
+    for(let yi=1; yi<=2; yi++){
+      const yPos=yCenter-ySize/2+yi*(ySize/3);
+      const gridGeo=new THREE.BoxGeometry(zSize*S, 0.03*S, 0.04*S);
+      const gridMesh=new THREE.Mesh(gridGeo, matGrill);
+      gridMesh.position.set(xPos*S, yPos*S, zCenter*S);
+      gridMesh.rotation.y=Math.PI/2;
+      parent.add(gridMesh);
+    }
+  }
+}
+
+// === BUILD PHASE 1 SOUTH SLOPE WITH DETAILED GLASS ===
+function buildPhase1SouthSlope(parent, cx){
+  // BOTTOM ROW (u ≈ 0.2 to 5.2)
+  // LGW#3 (rotated): v_center=0, v_size=6.67', u_size=5'
+  // WITH 3×3 grills (9 sub-panels)
+  addSlopeGlassPane(parent, 2.7, 0, 5, 6.67, true);
+
+  // NP1: v_center=+4.1, v_size=1', u_size=5' (no grills)
+  addSlopeGlassPane(parent, 2.7, 4.1, 5, 1, false);
+
+  // NP2: v_center=-4.1, v_size=1', u_size=5' (no grills)
+  addSlopeGlassPane(parent, 2.7, -4.1, 5, 1, false);
+
+  // 2×6 mullions (0.46' wide) between LGW#3 and NPs at bottom
+  // Left mullion
+  const mullionGeo1=new THREE.BoxGeometry(0.46*S, 5*S, 0.08*S);
+  const mullionMat=new THREE.MeshStandardMaterial({color:0x6B5B3E, roughness:0.8});
+  const mullion1=new THREE.Mesh(mullionGeo1, mullionMat);
+  const sinA=Math.sin(_glassAngle);
+  const cosA=Math.cos(_glassAngle);
+  const u1=2.7;
+  mullion1.position.set((0-3.33-0.23)*S, (_stemH+u1*sinA)*S, (_sZ-u1*cosA)*S);
+  mullion1.rotation.x=-(Math.PI/2-_glassAngle);
+  parent.add(mullion1);
+
+  // Right mullion
+  const mullion2=mullion1.clone();
+  mullion2.position.x=(0+3.33+0.23)*S;
+  parent.add(mullion2);
+
+  // TOP ROW (u ≈ 5.5 to 12.2)
+  // LGW#1: v_center=-2.65, v_size=5', u_size=6.67' WITH grills
+  addSlopeGlassPane(parent, 8.85, -2.65, 6.67, 5, true);
+
+  // LGW#2: v_center=+2.65, v_size=5', u_size=6.67' WITH grills
+  addSlopeGlassPane(parent, 8.85, 2.65, 6.67, 5, true);
+
+  // 2×4 mullion (0.29' wide) between LGW#1 and LGW#2 at top
+  const mullion3Geo=new THREE.BoxGeometry(0.29*S, 6.67*S, 0.08*S);
+  const mullion3=new THREE.Mesh(mullion3Geo, mullionMat);
+  const u2=8.85;
+  mullion3.position.set(0, (_stemH+u2*sinA)*S, (_sZ-u2*cosA)*S);
+  mullion3.rotation.x=-(Math.PI/2-_glassAngle);
+  parent.add(mullion3);
+}
+
+// === BUILD PHASE 1 EAST END WALL (at x=12) ===
+function buildPhase1EastEndWall(parent, xPos){
+  // Pentagon profile: pony wall (z from -6 to 6, y from 0 to 2.5)
+  // Door is double sliding patio, 6'W x 6.67'H at z from 0 to -6
+
+  // Pony wall south segment (z from 0 to 6)
+  // visible stone blocks
+  parent.add(box(0.8, _stemH, 3, matPonyWall, xPos, _stemH/2, 3));
+
+  // Door frame around double patio door (6'W x 6.67'H)
+  // Two 3' wide panels
+  parent.add(box(0.15, 6.67, 0.2, matFrame, xPos, 3.35, -3));  // Left side
+  parent.add(box(0.15, 6.67, 0.2, matFrame, xPos, 3.35, -3));  // Right side (center mullion will separate)
+  parent.add(box(0.15, 0.3, 6, matFrame, xPos, 6.67, -3));     // Top rail
+  parent.add(box(0.1, 6.67, 0.1, matFrame, xPos, 3.35, -3));   // Center mullion (3' panels)
+
+  // Double sliding glass patio door glass (two 3' wide panels)
+  const doorGeo1=new THREE.PlaneGeometry(3*S, 6.67*S);
+  const doorMesh1=new THREE.Mesh(doorGeo1, matDoorGlass);
+  doorMesh1.position.set(xPos*S, 3.35*S, -3*S);
+  doorMesh1.rotation.y=Math.PI/2;
+  parent.add(doorMesh1);
+
+  const doorGeo2=new THREE.PlaneGeometry(3*S, 6.67*S);
+  const doorMesh2=new THREE.Mesh(doorGeo2, matDoorGlass);
+  doorMesh2.position.set(xPos*S, 3.35*S, 0*S);
+  doorMesh2.rotation.y=Math.PI/2;
+  parent.add(doorMesh2);
+
+  // Transom glass above door (SD#1, cut to fit)
+  // From y=6.67' up to slope line which at z=0 is at y = 2.5 + (6/8)*9.53 = 9.66'
+  const transomH=9.66-6.67;
+  addWallPane(parent, xPos, 0, 6.67+transomH/2, 6, transomH, false);
+
+  // South triangle zone (z from 6 to 0, above pony wall, below slope line)
+  // Bay 2: ~3'W x 3.5'H centered at z≈3
+  // Use SMGW (6' x 4')
+  addWallPane(parent, xPos, 3, 2.5+3.5/2, 3, 3.5, false);
+
+  // Bay 1: small glass near south tip at z~5.5, height from 2.5 to ~8.8'
+  const bayH=8.8-2.5;
+  addWallPane(parent, xPos, 5.5, 2.5+bayH/2, 1.5, bayH, false);
+
+  // Vertical studs at bay boundaries (z=0 separating door from south zone)
+  parent.add(box(0.15, 9.66, 0.2, matFrame, xPos, 9.66/2, 0));
+
+  // Horizontal stud at z=6 (pony wall south edge)
+  parent.add(box(0.15, 0.3, 6, matFrame, xPos, 2.5, 3));
+}
+
+// === BUILD PHASE 1 CENTER WALL (at x=0) ===
+function buildPhase1CenterWall(parent, xPos){
+  // Pentagon profile, same as end wall but with single door at z≈-3
+
+  // Single door (3'W x 6.67'H) at z from -4.5 to -1.5, y from 0 to 6.67'
+  // Door frame
+  parent.add(box(0.15, 6.67, 0.2, matFrame, xPos, 3.35, -4.5));  // Left side
+  parent.add(box(0.15, 6.67, 0.2, matFrame, xPos, 3.35, -1.5));  // Right side
+  parent.add(box(0.15, 0.3, 3, matFrame, xPos, 6.67, -3));       // Top rail
+  parent.add(box(0.1, 6.67, 0.1, matFrame, xPos, 3.35, -3));     // Door mullion
+
+  // Single door glass (3'W x 6.67'H)
+  const doorGeo=new THREE.PlaneGeometry(3*S, 6.67*S);
+  const doorMesh=new THREE.Mesh(doorGeo, matDoorGlass);
+  doorMesh.position.set(xPos*S, 3.35*S, -3*S);
+  doorMesh.rotation.y=Math.PI/2;
+  parent.add(doorMesh);
+
+  // Transom above door (SD#2, cut to fit)
+  // Height from 6.67' to slope line at z=-3: y = 2.5 + (6-(-3))/8*9.53 = 12.03'
+  const transomH2=12.03-6.67;
+  addWallPane(parent, xPos, -3, 6.67+transomH2/2, 3, transomH2, false);
+
+  // Bay 3 glass (z from -6 to about -2, tall section): ~2'W x 7'H
+  // Use CDP or LW cut
+  addWallPane(parent, xPos, -4, 2.5+7/2, 2, 7, false);
+
+  // Bay 2 glass (z from about 0 to 6, shorter section): ~3'W x 3.5'H
+  // Use SMGW cut
+  addWallPane(parent, xPos, 3, 2.5+3.5/2, 3, 3.5, false);
+
+  // Pony wall segments on both sides of door
+  parent.add(box(0.8, _stemH, 1.5, matPonyWall, xPos, _stemH/2, -5.25));
+  parent.add(box(0.8, _stemH, 1.5, matPonyWall, xPos, _stemH/2, -0.75));
+
+  // Vertical studs at bay boundaries
+  parent.add(box(0.15, 12.03, 0.2, matFrame, xPos, 12.03/2, -2));
+  parent.add(box(0.15, 12.03, 0.2, matFrame, xPos, 12.03/2, -6));
+  parent.add(box(0.15, 9.66, 0.2, matFrame, xPos, 9.66/2, 0));
+}
+
+// === BUILD MODULE (Phase 2 only, generic glass) ===
 function buildModule(group, xOffset, outerSide){
   const cx=xOffset;
   const outerX = outerSide==='east' ? cx+W/2 : cx-W/2;
@@ -486,6 +768,7 @@ function buildModule(group, xOffset, outerSide){
   group.add(box(W, _northH, 1.2, matStraw, cx, _northH/2, _nZ-0.6));
   group.add(box(W, _northH, 0.35, matEarth, cx, _northH/2, _nZ+0.17));
 
+  // Generic glass slope (placeholder for Phase 2)
   const glassGeo=new THREE.PlaneGeometry(W*S, _glassSlope*S);
   const glassMesh=new THREE.Mesh(glassGeo, matGlass);
   glassMesh.position.set(cx*S, ((_stemH+_glassTopY)/2)*S, ((_sZ+_glassEndZ)/2)*S);
@@ -546,11 +829,18 @@ function buildModule(group, xOffset, outerSide){
   }
 }
 
-buildModule(phase1, 6, 'east');
-buildModule(phase2, -6, 'west');
+// === BUILD PHASE 1 ===
+buildPhase1SouthSlope(phase1, 6);
+buildPhase1EastEndWall(phase1, 12);
+buildPhase1CenterWall(phase1, 0);
 
+// Add shared center wall glass for both phases
 buildGlassWall(scene, 0);
 
+// === BUILD PHASE 2 (generic, simplified) ===
+buildModule(phase2, -6, 'west');
+
+// Path
 scene.add(box(28, 0.08, 2.5, matPath, 0, 0.04, _doorZ));
 
 // Compass
