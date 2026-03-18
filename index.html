@@ -765,61 +765,104 @@ function buildPhase1SouthSlope(parent, cx){
 
 // === BUILD PHASE 1 EAST END WALL (at x=12) ===
 function buildPhase1EastEndWall(parent, xPos){
-  // Pentagon glass shape with door hole: 6'W × 6.67'H at z from -3.5 to +2.5
-  const shape=makeWallProfile();
+  const wallWoodMat=new THREE.MeshStandardMaterial({color:0xB8860B,roughness:0.75,side:THREE.DoubleSide});
 
-  // Add door hole (6' wide from z=-3.5 to z=+2.5, height 6.67')
-  const dh=new THREE.Path();
-  dh.moveTo(-3.5*S, 0);
-  dh.lineTo(-3.5*S, 6.67*S);
-  dh.lineTo(2.5*S, 6.67*S);
-  dh.lineTo(2.5*S, 0);
-  dh.lineTo(-3.5*S, 0);
-  shape.holes.push(dh);
-
-  // Create glass wall shape
-  const geo=new THREE.ShapeGeometry(shape);
-  const mesh=new THREE.Mesh(geo, matGlassWall);
-  mesh.rotation.y=-Math.PI/2;
-  mesh.position.set(xPos*S, 0, 0);
-  parent.add(mesh);
-
-  // Vertical mullions (skip inside door zone)
-  for(let z=-5;z<=5;z+=2.5){
-    if(z>=-3.5 && z<=2.5) continue;  // Skip door zone
-    let h=wallHeightAtZ(z);
-    const mg=new THREE.Mesh(new THREE.BoxGeometry(0.1*S,h*S,0.08*S),matFrame);
-    mg.position.set(xPos*S,(h/2)*S,z*S);
-    parent.add(mg);
+  // Helper: add a ShapeGeometry wall piece at xPos
+  function wallShape(shape, mat){
+    const m=new THREE.Mesh(new THREE.ShapeGeometry(shape), mat);
+    m.rotation.y=-Math.PI/2;
+    m.position.set(xPos*S, 0, 0);
+    parent.add(m);
+  }
+  // Helper: add a glass pane at xPos (PlaneGeometry facing x-axis)
+  function glassPane(zCenter, yCenter, zWidth, yHeight){
+    const g=new THREE.Mesh(new THREE.PlaneGeometry(zWidth*S, yHeight*S), matGlassWall);
+    g.position.set(xPos*S, yCenter*S, zCenter*S);
+    g.rotation.y=Math.PI/2;
+    parent.add(g);
   }
 
-  // Door frame
-  // Left jamb at z=-3.5
-  parent.add(box(0.15, 6.67, 0.2, matFrame, xPos, 3.35, -3.5));
-  // Right jamb at z=+2.5
-  parent.add(box(0.15, 6.67, 0.2, matFrame, xPos, 3.35, 2.5));
-  // Header at y=6.67
-  parent.add(box(0.15, 0.3, 6, matFrame, xPos, 6.67, -0.5));
-  // Center mullion at z=-0.5 (separates two 3' panels)
-  parent.add(box(0.1, 6.67, 0.1, matFrame, xPos, 3.35, -0.5));
+  // === 1. SOUTH SLOPE TRIANGLE — solid wood ===
+  // Triangle from pony wall top at z=+6 up slope to door edge at z=+2.5
+  const st=new THREE.Shape();
+  st.moveTo(2.5*S, _stemH*S);
+  st.lineTo(2.5*S, wallHeightAtZ(2.5)*S); // ≈6.67
+  st.lineTo(_sZ*S, _stemH*S);
+  st.lineTo(2.5*S, _stemH*S);
+  wallShape(st, wallWoodMat);
 
-  // Two door glass panels (each 3'×6.67')
-  // Left panel centered at z=-2
-  const doorGeo1=new THREE.PlaneGeometry(3*S, 6.67*S);
-  const doorMesh1=new THREE.Mesh(doorGeo1, matDoorGlass);
-  doorMesh1.position.set(xPos*S, 3.35*S, -2*S);
-  doorMesh1.rotation.y=Math.PI/2;
-  parent.add(doorMesh1);
+  // === 2. ABOVE-DOOR WOOD PANEL with glass cutouts ===
+  // Polygon: door header up to roof slope and ridge
+  const hN=wallHeightAtZ(-3.5); // ≈12.206
+  const ad=new THREE.Shape();
+  ad.moveTo(-3.5*S, 6.67*S);         // bottom-left
+  ad.lineTo(2.5*S, 6.67*S);          // bottom-right (at slope)
+  ad.lineTo(-2*S, _glassTopY*S);     // up slope to ridge (12.03)
+  ad.lineTo(-3.5*S, hN*S);           // roof north of ridge
+  ad.lineTo(-3.5*S, 6.67*S);         // close
 
-  // Right panel centered at z=+1
-  const doorGeo2=new THREE.PlaneGeometry(3*S, 6.67*S);
-  const doorMesh2=new THREE.Mesh(doorGeo2, matDoorGlass);
-  doorMesh2.position.set(xPos*S, 3.35*S, 1*S);
-  doorMesh2.rotation.y=Math.PI/2;
-  parent.add(doorMesh2);
+  // Glass cutout: 3'W × 1'H pane (z=-1.6 to +1.4, y=6.87 to 7.87)
+  const g1h=new THREE.Path();
+  g1h.moveTo(-1.6*S,6.87*S); g1h.lineTo(1.4*S,6.87*S);
+  g1h.lineTo(1.4*S,7.87*S); g1h.lineTo(-1.6*S,7.87*S); g1h.lineTo(-1.6*S,6.87*S);
+  ad.holes.push(g1h);
 
-  // Pony wall on south side (z from 2.5 to 6)
+  // Glass cutout: 2'W × 1'H pane (z=-1.6 to +0.4, y=8.07 to 9.07)
+  const g2h=new THREE.Path();
+  g2h.moveTo(-1.6*S,8.07*S); g2h.lineTo(0.4*S,8.07*S);
+  g2h.lineTo(0.4*S,9.07*S); g2h.lineTo(-1.6*S,9.07*S); g2h.lineTo(-1.6*S,8.07*S);
+  ad.holes.push(g2h);
+
+  // Glass cutout: larger pane ~1.5'W × 4'H (z=-3.3 to -1.8, y=6.87 to 10.87)
+  const g3h=new THREE.Path();
+  g3h.moveTo(-3.3*S,6.87*S); g3h.lineTo(-1.8*S,6.87*S);
+  g3h.lineTo(-1.8*S,10.87*S); g3h.lineTo(-3.3*S,10.87*S); g3h.lineTo(-3.3*S,6.87*S);
+  ad.holes.push(g3h);
+
+  wallShape(ad, wallWoodMat);
+
+  // Place glass panes in the cutouts
+  glassPane(-0.1, 7.37, 3, 1);       // 3×1 pane
+  glassPane(-0.6, 8.57, 2, 1);       // 2×1 pane
+  glassPane(-2.55, 8.87, 1.5, 4);    // larger pane (~18"×48")
+
+  // === 3. NORTH SIDE GLASS PANEL (z=-6 to -3.5, full height) ===
+  const ns=new THREE.Shape();
+  ns.moveTo(_nZ*S, 0);
+  ns.lineTo(_nZ*S, _northH*S);
+  ns.lineTo(-3.5*S, hN*S);
+  ns.lineTo(-3.5*S, 0);
+  ns.lineTo(_nZ*S, 0);
+  wallShape(ns, matGlassWall);
+
+  // North side mullions
+  for(let z=-5;z<=-4;z+=1){
+    let h=wallHeightAtZ(z);
+    parent.add(box(0.1, h, 0.08, matFrame, xPos, h/2, z));
+  }
+
+  // === 4. DOOR FRAME AND GLASS ===
+  parent.add(box(0.15, 6.67, 0.2, matFrame, xPos, 3.35, -3.5));  // Left jamb
+  parent.add(box(0.15, 6.67, 0.2, matFrame, xPos, 3.35, 2.5));   // Right jamb
+  parent.add(box(0.15, 0.3, 6, matFrame, xPos, 6.67, -0.5));     // Header
+  parent.add(box(0.1, 6.67, 0.1, matFrame, xPos, 3.35, -0.5));   // Center mullion
+
+  // Door glass panels (each 3'×6.67')
+  const dg1=new THREE.Mesh(new THREE.PlaneGeometry(3*S,6.67*S),matDoorGlass);
+  dg1.position.set(xPos*S,3.35*S,-2*S); dg1.rotation.y=Math.PI/2; parent.add(dg1);
+  const dg2=new THREE.Mesh(new THREE.PlaneGeometry(3*S,6.67*S),matDoorGlass);
+  dg2.position.set(xPos*S,3.35*S,1*S); dg2.rotation.y=Math.PI/2; parent.add(dg2);
+
+  // === 5. PONY WALL (south side, z from 2.5 to 6) ===
   parent.add(box(0.8, _stemH, 3.5, matPonyWall, xPos, _stemH/2, 4.25));
+
+  // === 6. WOOD FRAMING above door ===
+  // Vertical mullion separating glass columns at z=-1.7
+  const mullH=wallHeightAtZ(-1.7)-6.67;
+  parent.add(box(0.15, mullH, 0.2, matFrame, xPos, 6.67+mullH/2, -1.7));
+  // North jamb post at z=-3.5 (above door to roof)
+  const postH=hN-6.67;
+  parent.add(box(0.15, postH, 0.2, matFrame, xPos, 6.67+postH/2, -3.5));
 }
 
 // === BUILD PHASE 1 CENTER WALL (at x=0) ===
