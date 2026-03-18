@@ -507,35 +507,37 @@ function addSlopeGlassPane(parent, uCenter, vCenter, uSize, vSize, withGrills){
   mesh.rotation.x=-(Math.PI/2-_glassAngle);
   parent.add(mesh);
 
-  // Add frame around perimeter
+  // Add frame around perimeter (positioned using slope coords, not world-Y offsets)
   const frameThickness=0.04; // feet
   const frameColor=0x6B5B3E;
   const frameMat=new THREE.MeshStandardMaterial({color:frameColor, roughness:0.8});
 
-  // Top frame
+  // Top frame (at u = uCenter + uSize/2, along slope)
+  const uTop=uCenter+uSize/2;
   const topGeo=new THREE.BoxGeometry(geoW+frameThickness*2*S, frameThickness*S, 0.08*S);
   const topMesh=new THREE.Mesh(topGeo, frameMat);
-  topMesh.position.copy(mesh.position);
-  topMesh.position.y+=(uSize/2)*S;
+  topMesh.position.set(vCenter*S, (_stemH+uTop*sinA)*S, (_sZ-uTop*cosA)*S);
   topMesh.rotation.x=mesh.rotation.x;
   parent.add(topMesh);
 
-  // Bottom frame
-  const botMesh=topMesh.clone();
-  botMesh.position.y-=uSize*S;
+  // Bottom frame (at u = uCenter - uSize/2, along slope)
+  const uBot=uCenter-uSize/2;
+  const botMesh=new THREE.Mesh(topGeo, frameMat);
+  botMesh.position.set(vCenter*S, (_stemH+uBot*sinA)*S, (_sZ-uBot*cosA)*S);
+  botMesh.rotation.x=mesh.rotation.x;
   parent.add(botMesh);
 
-  // Left frame
+  // Left frame (at v = vCenter - vSize/2)
   const leftGeo=new THREE.BoxGeometry(frameThickness*S, geoH+frameThickness*2*S, 0.08*S);
   const leftMesh=new THREE.Mesh(leftGeo, frameMat);
-  leftMesh.position.copy(mesh.position);
-  leftMesh.position.x-=(vSize/2)*S;
+  leftMesh.position.set((vCenter-vSize/2)*S, worldY*S, worldZ*S);
   leftMesh.rotation.x=mesh.rotation.x;
   parent.add(leftMesh);
 
-  // Right frame
-  const rightMesh=leftMesh.clone();
-  rightMesh.position.x+=(vSize)*S;
+  // Right frame (at v = vCenter + vSize/2)
+  const rightMesh=new THREE.Mesh(leftGeo, frameMat);
+  rightMesh.position.set((vCenter+vSize/2)*S, worldY*S, worldZ*S);
+  rightMesh.rotation.x=mesh.rotation.x;
   parent.add(rightMesh);
 
   // Add grills if requested (3x3 grid = 9 sub-panels)
@@ -736,13 +738,65 @@ function buildPhase1SouthSlope(parent, cx){
   parent.add(mullion3);
 
   // Horizontal rail between top and bottom rows at u≈5.5
-  const railGeo=new THREE.BoxGeometry(W*S, 0.1*S, 0.08*S);
+  const railGeo=new THREE.BoxGeometry(W*S, 0.25*S, 0.12*S);
   const railMat=new THREE.MeshStandardMaterial({color:0x6B5B3E, roughness:0.8});
   const uRail=5.5;
   const railMesh=new THREE.Mesh(railGeo, railMat);
   railMesh.position.set(cx*S, (_stemH+uRail*sinA)*S, (_sZ-uRail*cosA)*S);
   railMesh.rotation.x=-(Math.PI/2-_glassAngle);
   parent.add(railMesh);
+
+  // === EDGE RAFTERS (2×8 planks on left and right sides of slope) ===
+  const rafterMat=new THREE.MeshStandardMaterial({color:0x9E7A3C, roughness:0.75});
+
+  // Bottom row edge rafters (u from 0.2 to 5.2, length=5, at NP outer edges ≈ cx±4.6)
+  // Plus outer edge rafters at cx±6 (the full slope boundary)
+  const uBotC=2.7; // center of bottom row
+  const botRafterGeo=new THREE.BoxGeometry(0.6*S, 5*S, 0.125*S);
+
+  // Left outer rafter (at slope boundary, cx-6)
+  const lbOuter=new THREE.Mesh(botRafterGeo, rafterMat);
+  lbOuter.position.set((cx-W/2+0.3)*S, (_stemH+uBotC*sinA)*S, (_sZ-uBotC*cosA)*S);
+  lbOuter.rotation.x=-(Math.PI/2-_glassAngle);
+  parent.add(lbOuter);
+
+  // Left inner rafter (at NP2 outer edge, cx-4.6)
+  const lbInner=lbOuter.clone();
+  lbInner.position.x=(cx-4.6)*S;
+  parent.add(lbInner);
+
+  // Right outer rafter (at slope boundary, cx+6)
+  const rbOuter=lbOuter.clone();
+  rbOuter.position.x=(cx+W/2-0.3)*S;
+  parent.add(rbOuter);
+
+  // Right inner rafter (at NP1 outer edge, cx+4.6)
+  const rbInner=lbOuter.clone();
+  rbInner.position.x=(cx+4.6)*S;
+  parent.add(rbInner);
+
+  // Top row edge rafters (u from 5.5 to 12.2, length=6.67, at LGW outer edges ≈ cx±5.15)
+  const uTopC=8.85; // center of top row
+  const topRafterGeo=new THREE.BoxGeometry(0.6*S, 6.67*S, 0.125*S);
+
+  // Left rafter (at LGW#1 outer edge, cx-5.15)
+  const ltRafter=new THREE.Mesh(topRafterGeo, rafterMat);
+  ltRafter.position.set((cx-5.15)*S, (_stemH+uTopC*sinA)*S, (_sZ-uTopC*cosA)*S);
+  ltRafter.rotation.x=-(Math.PI/2-_glassAngle);
+  parent.add(ltRafter);
+
+  // Right rafter (at LGW#2 outer edge, cx+5.15)
+  const rtRafter=ltRafter.clone();
+  rtRafter.position.x=(cx+5.15)*S;
+  parent.add(rtRafter);
+
+  // Bottom horizontal purlin (at u=0.2, where glass meets pony wall)
+  const botPurlinGeo=new THREE.BoxGeometry(W*S, 0.25*S, 0.5*S);
+  const uBottom=0.2;
+  const botPurlin=new THREE.Mesh(botPurlinGeo, rafterMat);
+  botPurlin.position.set(cx*S, (_stemH+uBottom*sinA)*S, (_sZ-uBottom*cosA)*S);
+  botPurlin.rotation.x=-(Math.PI/2-_glassAngle);
+  parent.add(botPurlin);
 }
 
 // === BUILD PHASE 1 EAST END WALL (at x=12) ===
