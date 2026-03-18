@@ -1036,7 +1036,7 @@ function viewPreset(v){
   panOffset.set(0,0,0);
   if(v==='se'){spherical={r:18*S,theta:Math.PI/4,phi:Math.PI/3};}
   else if(v==='south'){spherical={r:16*S,theta:0,phi:Math.PI/3};}
-  else if(v==='east'){spherical={r:12*S,theta:Math.PI/2,phi:Math.PI/2.3};panOffset.set(2*S,0.5*S,0);}
+  else if(v==='east'){spherical={r:18*S,theta:0,phi:Math.PI/2};panOffset.set(12*S,5*S,0);}
   else if(v==='top'){spherical={r:16*S,theta:0.1,phi:0.3};}
   else if(v==='inside'){spherical={r:6*S,theta:Math.PI/5,phi:Math.PI/2.5};panOffset.set(1.5*S,0,0);}
   updateCamera();
